@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  app:
+    image: node:16-alpine
+    volumes:
+      - ".:/home/app"
+    working_dir: "/home/app"
+    command:
+      ["npm", "run", "exec"]
+    environment:
+      http_proxy: "http://squid:3128"
+      https_proxy: "http://squid:3128"
+    depends_on:
+      - squid
+  squid:
+    image: ubuntu/squid
+    environment:
+      TZ: "UTC"
+    ports:
+      - "3128:3128"
+    volumes:
+      - "./volume/log:/var/log/squid" # Volume to store squid logs
+      - "./volume/spool:/var/spool/squid" # Volume to store the squid cache
+      - "./volume/squid.conf:/etc/squid/squid.conf" # Main squid configuration file
+      #- "./volume/snippet.conf:/etc/squid/conf.d/snippet.conf" # Configuration snippets included by squid.conf
